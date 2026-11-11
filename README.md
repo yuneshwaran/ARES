@@ -1,60 +1,83 @@
-# ARES
-<p align = "center"
-   
-![LOGO](https://user-images.githubusercontent.com/126149253/223385894-b34f4ce7-537c-44e2-97fe-d9b5ec97322b.png)
+# AresJobSearch
 
-</p>
-
-
-## Description
-ARES is a job search application developed using the MERN stack, with MongoDB as the database, Express.js as the server-side framework, React.js as the client-side framework, and Node.js as the runtime environment. The application will provide job seekers with a user-friendly interface to create accounts, build resumes and cover letters, search and filter job listings, and apply to jobs. The application will also provide employers with a platform to post job openings, review resumes, and communicate with job seekers.
-
-The objective of ARES is to allow job seekers to search for jobs by job title, location, salary range, and job type. The search results will be displayed in a list view, with options to view job details, save jobs, and apply for jobs. Job seekers will be able to upload their resumes and cover letters, as well as create and edit their profiles. Employers will be able to post job openings with job details such as job description, qualifications, and application instructions. They will also be able to review resumes, communicate with job seekers, and manage their job postings.
+AI-powered job search, resume tailoring, application tracking, and optional auto-apply automation for Windows (100% free-tier compatible).
 
 ## Features
 
-⦿ Registration:  allow job seekers to create an account and profile, providing personal details, work history, education, and skills.
-      
-⦿ Job Posting: Employers can post job openings etc.          
+1. **Multi-Board Discovery** (`python-jobspy` + The Muse + optional Adzuna/JSearch) with fuzzy deduplication across LinkedIn, Indeed, Glassdoor, ZipRecruiter, and Google Jobs.
+2. **Gemini AI Match Scoring** — scores discovered jobs (0–100) against your master `config/resume.pdf` and filters out low matches.
+3. **Resume & Cover Letter Tailoring** — rewrites summary and bullets truthfully per job description using Jinja2 HTML templates rendered to ATS-friendly PDFs.
+4. **Gmail Status Tracking & Excel Tracker** — polls Gmail for recruiter emails, classifies status (`applied`, `interview`, `rejected`, `offer`) via regex + Gemini AI, and updates `data/tracker.xlsx` (plus optional Google Sheets sync).
+5. **Playwright Auto-Apply** — supports Greenhouse, Lever, and generic ATS forms with a default **review-before-submit** safety gate and daily rate limits.
+6. **Windows Task Scheduler** — PowerShell setup script to run discovery and email tracking automatically on a schedule.
 
-⦿ Job Search: Job seekers can search for available jobs.
+## Setup
 
-⦿ Job Application : Job Seekers can Apply for the job they aspire with the resume and other documents
+### 1. Install Dependencies
 
-⦿ Employer Dashboard:  Provides a dashboard for managing job postings, reviewing job applications, and communicating with job seekers.
+```powershell
+python -m venv venv
+.\venv\Scripts\python.exe -m pip install -r requirements.txt
+.\venv\Scripts\python.exe -m playwright install chromium
+```
 
+### 2. Provide Your Resources
 
+Run the checklist helper:
 
-## Languages
+```powershell
+.\venv\Scripts\python.exe scripts\first_run.py
+```
 
-<ul>
-<li>
-HTML
-</li>
+Required / optional files in `config/`:
+- `config/resume.pdf` *(mandatory for scoring & tailoring)* — your master resume PDF.
+- `config/.env` — copy from `config/.env.example` and add your free `GEMINI_API_KEY` from Google AI Studio.
+- `config/credentials.json` *(needed for Gmail / Google Sheets)* — OAuth 2.0 Desktop App client secrets from Google Cloud Console.
+- `config/settings.yaml` — customize `search.titles`, `search.locations`, `boards`, `scoring`, `apply`, and `tracker`.
+- `config/profile.yaml` — fill in your personal info and custom answers before using `apply`.
 
-<li>
-JavaScript
-</li>
-<li>
-React JS
-</li>
-<li>
-Node JS 
-</li>
-<li>
-Mongo DB
-</li>
-</ul>
+## Usage
 
+```powershell
+# Discover new jobs
+.\venv\Scripts\python.exe main.py search
 
+# Score new jobs against config/resume.pdf
+.\venv\Scripts\python.exe main.py score
 
-## Authors 
+# Generate tailored resumes & cover letters for top jobs
+.\venv\Scripts\python.exe main.py tailor
 
-<a href="https://github.com/ViishalM">Vishal</a>
+# Open pre-filled applications in review mode
+.\venv\Scripts\python.exe main.py apply --mode review
 
-<a href="https://github.com/ROOSSOp2452">Roosso</a>
+# Check Gmail for recruiter replies and update Excel tracker
+.\venv\Scripts\python.exe main.py check-email
 
-<a href="https://github.com/Ashwathg17">Ashwath</a>
+# Export/sync SQLite jobs to data/tracker.xlsx (and Google Sheets if enabled)
+.\venv\Scripts\python.exe main.py sync-tracker
 
-<a href="https://github.com/yuneshwaran">Yuneshwaran</a>
+# View terminal dashboard
+.\venv\Scripts\python.exe main.py dashboard
 
+# Launch HTML/CSS Web Monitoring Console (opens http://127.0.0.1:8501)
+.\venv\Scripts\python.exe main.py web
+
+# Inspect configuration and test Gemini + Discord webhook
+.\venv\Scripts\python.exe main.py test-config --live
+
+# Run full pipeline
+.\venv\Scripts\python.exe main.py run all
+```
+
+## Windows Scheduling
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts\setup_scheduler.ps1
+```
+
+## Testing
+
+```powershell
+.\venv\Scripts\python.exe -m pytest tests -v
+```

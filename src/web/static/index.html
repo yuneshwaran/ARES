@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AresJobSearch — Monitoring Console</title>
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-badge">ARES</span>
+      <div>
+        <h1>AresJobSearch Console</h1>
+        <p class="subtitle">Job Discovery, AI Scoring, Gmail Tracking &amp; Integration Health</p>
+      </div>
+    </div>
+    <div class="topbar-actions">
+      <label class="toggle">
+        <input type="checkbox" id="autoRefresh" checked />
+        <span>Auto-refresh (10s)</span>
+      </label>
+      <button class="btn btn-secondary" id="refreshBtn">Refresh Now</button>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- Action Bar -->
+    <section class="action-bar card">
+      <div class="action-buttons">
+        <button class="btn btn-primary" data-action="search">Run Discovery</button>
+        <button class="btn btn-secondary" data-action="score">Score Jobs</button>
+        <button class="btn btn-secondary" data-action="tailor">Tailor Resumes</button>
+        <button class="btn btn-secondary" data-action="check-email">Check Gmail</button>
+        <button class="btn btn-secondary" data-action="sync-tracker">Sync Excel / Sheets</button>
+      </div>
+      <div class="task-banner" id="taskBanner">
+        <span class="dot idle" id="taskDot"></span>
+        <span id="taskStatusText">Idle — ready for commands</span>
+      </div>
+    </section>
+
+    <!-- KPI Cards -->
+    <section class="kpi-grid" id="kpiGrid">
+      <div class="card kpi"><span class="kpi-label">Total Jobs</span><strong class="kpi-val" id="kpiTotal">0</strong></div>
+      <div class="card kpi"><span class="kpi-label">Scored / Ready</span><strong class="kpi-val accent-blue" id="kpiReady">0</strong></div>
+      <div class="card kpi"><span class="kpi-label">Applied</span><strong class="kpi-val accent-amber" id="kpiApplied">0</strong></div>
+      <div class="card kpi"><span class="kpi-label">Interviews</span><strong class="kpi-val accent-green" id="kpiInterview">0</strong></div>
+      <div class="card kpi"><span class="kpi-label">Offers</span><strong class="kpi-val accent-emerald" id="kpiOffer">0</strong></div>
+      <div class="card kpi"><span class="kpi-label">Daily Apply Quota</span><strong class="kpi-val" id="kpiQuota">0 / 25</strong></div>
+    </section>
+
+    <!-- Pipeline Funnel -->
+    <section class="card funnel-card">
+      <div class="card-header">
+        <h2>Pipeline Breakdown</h2>
+        <span class="muted" id="applyPolicyBadge">Apply Mode: review</span>
+      </div>
+      <div class="funnel-bars" id="funnelBars"></div>
+    </section>
+
+    <!-- Navigation Tabs -->
+    <nav class="tabs">
+      <button class="tab active" data-tab="jobsTab">Jobs Pipeline</button>
+      <button class="tab" data-tab="emailsTab">Recruiter Emails</button>
+      <button class="tab" data-tab="runsTab">Run History &amp; Logs</button>
+      <button class="tab" data-tab="configTab">Config &amp; Integration Tests</button>
+    </nav>
+
+    <!-- Tab 1: Jobs -->
+    <section class="tab-panel active" id="jobsTab">
+      <div class="card">
+        <div class="filters">
+          <input type="search" id="searchInput" placeholder="Search title, company, location, or source..." />
+          <select id="statusFilter">
+            <option value="all">All Statuses</option>
+            <option value="new">New</option>
+            <option value="scored">Scored</option>
+            <option value="ready_to_apply">Ready to Apply</option>
+            <option value="applied">Applied</option>
+            <option value="interview">Interview</option>
+            <option value="offer">Offer</option>
+            <option value="rejected">Rejected</option>
+            <option value="skipped">Skipped</option>
+          </select>
+          <div class="score-filter">
+            <label for="minScoreInput">Min Score: <strong id="minScoreLabel">0%</strong></label>
+            <input type="range" id="minScoreInput" min="0" max="95" step="5" value="0" />
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Score</th>
+                <th>Role</th>
+                <th>Company</th>
+                <th>Location</th>
+                <th>Source</th>
+                <th>Status</th>
+                <th>Update Status</th>
+                <th>Link</th>
+              </tr>
+            </thead>
+            <tbody id="jobsTableBody">
+              <tr><td colspan="8" class="empty">Loading jobs...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tab 2: Emails -->
+    <section class="tab-panel" id="emailsTab">
+      <div class="card">
+        <div class="card-header">
+          <h2>Tracked Recruiter Emails</h2>
+          <span class="muted">Populated by <code>check-email</code></span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Sender</th>
+                <th>Subject</th>
+                <th>Classified</th>
+                <th>Snippet</th>
+              </tr>
+            </thead>
+            <tbody id="emailsTableBody">
+              <tr><td colspan="5" class="empty">No emails recorded yet.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tab 3: Runs & Logs -->
+    <section class="tab-panel" id="runsTab">
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header">
+            <h2>Recent Run History</h2>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Type</th>
+                  <th>Status</th>
+                  <th>Found</th>
+                  <th>Applied</th>
+                  <th>Started</th>
+                </tr>
+              </thead>
+              <tbody id="runsTableBody">
+                <tr><td colspan="5" class="empty">No runs yet.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <h2>Live Task &amp; Log Tail</h2>
+            <span class="muted">logs/ares.log</span>
+          </div>
+          <pre class="log-box" id="taskOutputBox">No background task output yet.</pre>
+          <pre class="log-box log-tail" id="logTailBox">Waiting for logs...</pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tab 4: Config & Integration Health -->
+    <section class="tab-panel" id="configTab">
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <h2>Configuration &amp; Credential Health</h2>
+            <p class="muted">Checks local files plus live connectivity tests for Gemini AI and Discord.</p>
+          </div>
+          <button class="btn btn-primary" id="runLiveTestsBtn">Run Live API &amp; Discord Test</button>
+        </div>
+        <div class="health-grid" id="healthGrid"></div>
+        <div class="live-results" id="liveResults"></div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Job Detail Modal -->
+  <div class="modal-backdrop hidden" id="jobModal">
+    <div class="modal card">
+      <div class="modal-header">
+        <div>
+          <h2 id="modalTitle">Job Title</h2>
+          <p class="muted" id="modalSub">Company • Location</p>
+        </div>
+        <button class="btn btn-secondary" id="closeModalBtn">Close</button>
+      </div>
+      <div class="modal-body">
+        <div class="modal-meta" id="modalMeta"></div>
+        <h3>AI Match Reasoning</h3>
+        <p id="modalReasoning" class="reasoning-box"></p>
+        <h3>Description</h3>
+        <pre id="modalDescription" class="description-box"></pre>
+      </div>
+    </div>
+  </div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>{{ name }} - Resume</title>
+  <style>
+    @page {
+      size: A4;
+      margin: 0.5in 0.55in;
+    }
+    body {
+      font-family: "Segoe UI", Arial, Helvetica, sans-serif;
+      font-size: 10.2pt;
+      line-height: 1.38;
+      color: #1f2937;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      text-align: center;
+      border-bottom: 1.5px solid #1565c0;
+      padding-bottom: 8px;
+      margin-bottom: 12px;
+    }
+    h1 {
+      font-size: 20pt;
+      margin: 0 0 4px 0;
+      color: #0f172a;
+      letter-spacing: 0.3px;
+    }
+    .contact {
+      font-size: 9.2pt;
+      color: #475569;
+    }
+    h2 {
+      font-size: 11pt;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: #1565c0;
+      border-bottom: 1px solid #cbd5e1;
+      padding-bottom: 2px;
+      margin: 12px 0 6px 0;
+    }
+    p.summary {
+      margin: 4px 0 8px 0;
+    }
+    .entry {
+      margin-bottom: 8px;
+    }
+    .entry-header {
+      display: flex;
+      justify-content: space-between;
+      font-weight: 600;
+      color: #0f172a;
+    }
+    .entry-sub {
+      font-size: 9.4pt;
+      color: #475569;
+      margin-bottom: 3px;
+    }
+    ul {
+      margin: 2px 0 6px 18px;
+      padding: 0;
+    }
+    li {
+      margin-bottom: 2px;
+    }
+    .skills-list {
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>{{ name }}</h1>
+    {% if contact_line %}
+    <div class="contact">{{ contact_line }}</div>
+    {% endif %}
+  </header>
+
+  {% if summary %}
+  <section>
+    <h2>Professional Summary</h2>
+    <p class="summary">{{ summary }}</p>
+  </section>
+  {% endif %}
+
+  {% if skills %}
+  <section>
+    <h2>Technical Skills</h2>
+    <div class="skills-list">{{ skills | join(" • ") }}</div>
+  </section>
+  {% endif %}
+
+  {% if experience %}
+  <section>
+    <h2>Experience</h2>
+    {% for exp in experience %}
+    <div class="entry">
+      <div class="entry-header">
+        <span>{{ exp.title }}{% if exp.company %} — {{ exp.company }}{% endif %}</span>
+        <span>{{ exp.dates }}</span>
+      </div>
+      {% if exp.location %}
+      <div class="entry-sub">{{ exp.location }}</div>
+      {% endif %}
+      {% if exp.bullets %}
+      <ul>
+        {% for bullet in exp.bullets %}
+        <li>{{ bullet }}</li>
+        {% endfor %}
+      </ul>
+      {% endif %}
+    </div>
+    {% endfor %}
+  </section>
+  {% endif %}
+
+  {% if projects %}
+  <section>
+    <h2>Projects</h2>
+    {% for proj in projects %}
+    <div class="entry">
+      <div class="entry-header">
+        <span>{{ proj.name }}</span>
+        <span>{{ proj.tech }}</span>
+      </div>
+      {% if proj.bullets %}
+      <ul>
+        {% for bullet in proj.bullets %}
+        <li>{{ bullet }}</li>
+        {% endfor %}
+      </ul>
+      {% endif %}
+    </div>
+    {% endfor %}
+  </section>
+  {% endif %}
+
+  {% if education %}
+  <section>
+    <h2>Education</h2>
+    {% for edu in education %}
+    <div class="entry">
+      <div class="entry-header">
+        <span>{{ edu.degree }}{% if edu.school %} — {{ edu.school }}{% endif %}</span>
+        <span>{{ edu.year }}</span>
+      </div>
+    </div>
+    {% endfor %}
+  </section>
+  {% endif %}
+</body>
+</html>

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>{{ name }} - Cover Letter</title>
+  <style>
+    @page {
+      size: A4;
+      margin: 0.75in 0.8in;
+    }
+    body {
+      font-family: "Segoe UI", Arial, Helvetica, sans-serif;
+      font-size: 10.8pt;
+      line-height: 1.5;
+      color: #1f2937;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      border-bottom: 1.5px solid #1565c0;
+      padding-bottom: 10px;
+      margin-bottom: 22px;
+    }
+    h1 {
+      font-size: 18pt;
+      margin: 0 0 4px 0;
+      color: #0f172a;
+    }
+    .contact {
+      font-size: 9.5pt;
+      color: #475569;
+    }
+    .meta {
+      margin-bottom: 18px;
+      color: #334155;
+    }
+    p {
+      margin: 0 0 12px 0;
+    }
+    .signoff {
+      margin-top: 22px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>{{ name }}</h1>
+    {% if contact_line %}
+    <div class="contact">{{ contact_line }}</div>
+    {% endif %}
+  </header>
+
+  <div class="meta">
+    {% if date %}<div>{{ date }}</div>{% endif %}
+    <div><strong>{{ recipient or "Hiring Team" }}</strong></div>
+    {% if company %}<div>{{ company }}</div>{% endif %}
+    {% if role %}<div>Re: {{ role }}</div>{% endif %}
+  </div>
+
+  <p>Dear {{ recipient or "Hiring Team" }},</p>
+
+  {% for para in paragraphs %}
+  <p>{{ para }}</p>
+  {% endfor %}
+
+  <div class="signoff">
+    <p>Sincerely,<br/><strong>{{ name }}</strong></p>
+  </div>
+</body>
+</html>

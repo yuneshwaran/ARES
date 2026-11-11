@@ -1,0 +1,94 @@
+# AresJobSearch Configuration
+
+# Job Search Criteria
+search:
+  titles:
+    - "Software Engineer"
+    - "Backend Developer"
+    - "Python Developer"
+  locations:
+    - "Remote"
+    - "Bangalore, India"
+  country_indeed: "india"             # Country code for Indeed/Glassdoor scraping
+  experience_level: "entry"           # entry | mid | senior
+  salary_min: 0                       # 0 = no minimum
+  job_type: "fulltime"                # fulltime | parttime | contract | internship
+  hours_old: 24                       # Only jobs posted within last N hours
+  results_per_board: 50               # Max results per board per run
+  exclude_companies:
+    - "Revature"
+    - "Infosys BPO"
+  required_keywords: []               # Must contain ALL of these (case-insensitive)
+  exclude_keywords:
+    - "clearance required"
+    - "US citizens only"
+
+# Board Configuration (all free-tier by default)
+boards:
+  jobspy:
+    enabled: true
+    sites:
+      - linkedin
+      - indeed
+      - glassdoor
+      - zip_recruiter
+      - google
+    proxy: null                       # Optional: ["http://user:pass@host:port"]
+  themuse:
+    enabled: false                    # Optional (endpoint currently 404 for public anonymous access)
+    max_pages: 2
+  remotive:
+    enabled: true                     # Free remote jobs API, no key required
+    limit: 25
+  arbeitnow:
+    enabled: false                    # Free job board API, no key required (mostly EU/remote)
+  jsearch:
+    enabled: false                    # Disabled by default (~200 req/month free limit)
+    # API key in config/.env as JSEARCH_API_KEY
+  adzuna:
+    enabled: false                    # Free ~250 calls/day with free registration
+    country: "in"
+    # API keys in config/.env as ADZUNA_APP_ID and ADZUNA_APP_KEY
+
+# Scoring
+scoring:
+  min_match_score: 60                 # 0-100, jobs below this are marked skipped
+  auto_apply_threshold: 85            # Score above which auto-apply triggers
+  gemini_model: "gemini-2.0-flash"
+
+# Auto-Apply
+apply:
+  enabled: false                      # Master switch (enable when ready)
+  mode: "review"                      # review | semi_auto | full_auto
+  max_daily_applications: 25
+  delay_between_actions_sec: [2, 5]   # Random delay range [min, max]
+  upload_tailored_resume: true
+  generate_cover_letter: true
+  headless: false                     # Keep false for review mode & bot-detection safety
+
+# Email Tracking
+email:
+  provider: "gmail"
+  check_interval_minutes: 60
+  max_results: 30
+  labels_to_search:
+    - "INBOX"
+  search_query: "from:(*@greenhouse.io OR *@lever.co OR *recruiter* OR *hiring* OR *career* OR *talent* OR *jobs*) OR subject:(application OR interview OR candidate OR \"thank you for applying\")"
+
+# Excel & Google Sheets Tracker
+tracker:
+  excel_path: "data/tracker.xlsx"
+  sheets_sync: false
+  sheets_id: ""                       # Google Sheet ID if sheets_sync is enabled
+  sheets_worksheet: "Applications"
+
+# Scheduling
+schedule:
+  job_search_cron: "0 */6 * * *"      # Every 6 hours
+  email_check_cron: "0 * * * *"       # Every hour
+
+# Notifications
+notifications:
+  windows_toast: true
+  discord_webhook: ""
+  email_summary: false
